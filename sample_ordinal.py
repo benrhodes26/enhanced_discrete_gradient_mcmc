@@ -138,7 +138,7 @@ def plot_cov_error_comparison(save_dir, cov_errors, method_names, n_iters=None, 
         save_fig(fig, save_dir, name)
 
 
-def plot_and_save(args, method_dicts, chains, hops, accept_rates, metrics, ess, n_iters, times, save_dir):
+def plot_and_save_fn(args, method_dicts, chains, hops, accept_rates, metrics, ess, n_iters, times, save_dir):
 
     # save arguments passed into this function (to make it trivial to recreate figures later)
     to_save = locals()
@@ -160,7 +160,7 @@ def plot_and_save(args, method_dicts, chains, hops, accept_rates, metrics, ess, 
     plot_cov_error_comparison(save_dir, cov_errors, method_names, times=times)
 
 
-def compute_metrics(args, method, x_all, metrics_dict, sampler, target_dist, true_cov_mat):
+def compute_metrics(args, method_name, x_all, metrics_dict, sampler, target_dist, true_cov_mat):
 
     n_chains, n_steps, n_dims = x_all.shape
     x_all_c = x_all - x_all.mean(dim=1, keepdims=True)
@@ -168,7 +168,7 @@ def compute_metrics(args, method, x_all, metrics_dict, sampler, target_dist, tru
     cov_error = torch.linalg.norm(est_cov_mat - true_cov_mat, dim=(1, 2))  # (n_chains,)
 
     av_cov_error, std_cov_error = cov_error.mean().item(), cov_error.std().item() / n_chains ** 0.5
-    metrics_dict[method].setdefault("cov_error", []).append([av_cov_error, std_cov_error])
+    metrics_dict[method_name].setdefault("cov_error", []).append([av_cov_error, std_cov_error])
     print(f"len chain: {len(x_all)}. COV error: {av_cov_error:.4f}")
 
     # compute empirical marginal distributions (over a sliding window of samples from the MCMC chains)
@@ -188,7 +188,7 @@ def compute_metrics(args, method, x_all, metrics_dict, sampler, target_dist, tru
     kls = target_dist.neg_entropy_1d().to(x_all.device) + cross_entropy  # (n_chains,)
 
     av_marginal_kl, std_marginal_kl = kls.mean().item(), kls.std().item() / n_chains**0.5
-    metrics_dict[method].setdefault("marginal_kl", []).append([av_marginal_kl, std_marginal_kl])
+    metrics_dict[method_name].setdefault("marginal_kl", []).append([av_marginal_kl, std_marginal_kl])
     print(f"KL(p_true, p_empirical) = {av_marginal_kl}")
 
 
@@ -239,8 +239,8 @@ def main(args):
     if args.data_dim == 20:
         if "poly4" in args.model_name:
             methods = [
-                # {'name': 'NCG', 'epsilon': 0.05},
-                # {'name': 'AVG', 'epsilon': 0.02},
+                {'name': 'NCG', 'epsilon': 0.05},
+                {'name': 'AVG', 'epsilon': 0.02},
                 {'name': 'PAVG', 'epsilon': 0.02, 'postadapt_epsilon': 0.06},
                 {'name': 'Gibbs', 'random_scan': True},
                 {'name': 'GWG', 'radius': 1},
@@ -263,7 +263,7 @@ def main(args):
         raise NotImplementedError("need to specify methods and hyperparameters for: ", args.model_name)
 
 
-    run_sampling_procedure(args, methods, target_dist, chain_init, metric_fn, plot_and_save)
+    run_sampling_procedure(args, methods, target_dist, chain_init, metric_fn, plot_and_save_fn)
 
 
 def parse_args():

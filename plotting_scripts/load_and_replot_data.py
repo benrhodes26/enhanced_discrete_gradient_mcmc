@@ -1,7 +1,7 @@
 import os
 import pickle
-from sample_ordinal import plot_and_save as plot_and_save_ordinal_results
-from sample_sparse_bayes_linear import plot_and_save as plot_and_save_sbl_results
+from sample_ordinal import plot_and_save_fn as plot_and_save_ordinal_results
+from sample_sparse_bayes_linear import plot_and_save_fn as plot_and_save_sbl_results
 from plotting_scripts.helper_fns import add_results2_to_results1
 
 '''When we run scripts like `sample_ordinal' or `sample_sparse_bayes_linear', error metric plots are created like those

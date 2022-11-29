@@ -127,7 +127,7 @@ def get_sampler(args, method_dict, save_dir):
     return sampler
 
 
-def run_sampling_procedure(args, methods, target_dist, chain_init, compute_metrics, plot_and_save):
+def run_sampling_procedure(args, methods, target_dist, chain_init, metric_fn, plot_and_save_fn):
 
     np.set_printoptions(precision=3)
     torch.manual_seed(args.seed)
@@ -228,7 +228,7 @@ def run_sampling_procedure(args, methods, target_dist, chain_init, compute_metri
                         metric_samples = torch.stack(sliding_window_empirical_dist, dim=1)  # (n_chains, n_steps, n_dims)
                     else:
                         metric_samples = x.unsqueeze(1).detach().cpu()
-                    compute_metrics(args, method, metric_samples, metrics_dict, sampler)
+                    metric_fn(args, method, metric_samples, metrics_dict, sampler)
 
         accept_rates_dict[method] = list(sampler.acc_rates)
         prop_hops_dict[method] = list(sampler.proposed_hops)
@@ -251,13 +251,13 @@ def run_sampling_procedure(args, methods, target_dist, chain_init, compute_metri
             print(f"ESS = {ess_dict[method].mean()} +/- {ess_dict[method].std()} (mean +/- std over {ess_statistic.shape[1]} chains)")
 
     # Plot comparisons across methods, and save all results
-    plot_and_save(args=args,
-                  method_dicts=methods,
-                  chains=chains_dict,
-                  hops=hops_dict,
-                  accept_rates=accept_rates_dict,
-                  metrics=metrics_dict,
-                  ess=ess_dict,
-                  n_iters=n_iters_dict,
-                  times=times_dict,
-                  save_dir=save_dir)
+    plot_and_save_fn(args=args,
+                     method_dicts=methods,
+                     chains=chains_dict,
+                     hops=hops_dict,
+                     accept_rates=accept_rates_dict,
+                     metrics=metrics_dict,
+                     ess=ess_dict,
+                     n_iters=n_iters_dict,
+                     times=times_dict,
+                     save_dir=save_dir)

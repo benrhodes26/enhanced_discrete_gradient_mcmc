@@ -1,8 +1,14 @@
+import argparse
 import os
 import numpy as np
 import pickle
 from matplotlib import pyplot as plt
 from utils.utils import save_fig
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--timestamp', type=str)
+args = parser.parse_args()
 
 save_path = "C:/Users/benja/Code/ebm/results/ising/sigma0.2/dim16/"
 
@@ -10,7 +16,7 @@ strengths = np.array([-0.5, -0.4, -0.3, -0.2, -0.1, 0.0, 0.1 , 0.2, 0.3, 0.4, 0.
 all_pairwise_errors = {}
 for s in strengths:
     target_type = f"higher_order_strength_{s}"
-    path = f"C:/Users/benja/Code/ebm/results/ising/sigma0.2/dim16/{target_type}/final_5min"
+    path = f"C:/Users/benja/Code/ebm/results/ising/sigma0.2/dim16/{target_type}/{args.timestamp}"
 
     with open(os.path.join(path, "results.pkl"), "rb") as f:
         res = pickle.load(f)

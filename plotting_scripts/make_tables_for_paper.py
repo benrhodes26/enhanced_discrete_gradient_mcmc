@@ -1,3 +1,5 @@
+import argparse
+
 from matplotlib import pyplot as plt
 import numpy as np
 import os
@@ -235,9 +237,11 @@ def make_buffer_plots(methods, all_K_vals, n_dims, dirpath, true_fpath):
 
 
 def main():
-
-    # plot_type = "ising_lattice_table"
-    plot_type = "usps_table"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--plot_type', type=str, default="ising_lattice_table",
+                        choice={"ising_lattice_table, usps_table"})
+    args = parser.parse_args()
+    plot_type = args.plot_type
 
     if plot_type == "ising_lattice_table":
 

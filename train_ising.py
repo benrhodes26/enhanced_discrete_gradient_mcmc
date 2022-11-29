@@ -193,16 +193,9 @@ def generate_data(args):
         model = LatticeIsingModel(args.dim_sqrt ** 2, args.sigma)
         sampler = BGAVSampler(n_dims=args.dim_sqrt ** 2, model_name=args.model)
 
-    elif args.data_model == "ising_lattice_3d":
-        model = LatticeIsingModel(args.dim_sqrt ** 2, args.sigma, lattice_dim=3)
-        sampler = BGAVSampler(n_dims=args.dim_sqrt ** 2, model_name=args.model)
-        print(model.sigma)
-        print(model.G)
-        print(model.J)
-
     elif args.data_model == "er_ising":
         model = ERIsingModel(args.dim_sqrt, args.degree, args.sigma)
-        sampler = BGAVSampler(model_name=args.model)
+        sampler = BGAVSampler(n_dims=args.dim_sqrt**2, model_name=args.model)
         print(model.G)
         print(model.J)
 

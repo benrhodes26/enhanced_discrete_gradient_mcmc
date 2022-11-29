@@ -10,7 +10,7 @@ device = torch.device('cuda:' + str(0) if torch.cuda.is_available() else 'cpu')
 set_default_rcparams()
 
 
-"""This script can be use to generate Figure 11 in the appendix of the paper"""
+"""This script can be use to generate Figure 11/12 in the appendix of the paper"""
 
 def main(args):
     subdir = os.path.join(args.save_dir, f"dim{args.data_dim}")

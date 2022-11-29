@@ -15,16 +15,16 @@ device = torch.device('cuda:' + str(0) if torch.cuda.is_available() else 'cpu')
 set_default_rcparams()
 
 
-def plot_and_save(args,
-                  method_dicts,
-                  chains,
-                  hops,
-                  accept_rates,
-                  metrics,
-                  ess,
-                  n_iters,
-                  times,
-                  save_dir):
+def plot_and_save_fn(args,
+                     method_dicts,
+                     chains,
+                     hops,
+                     accept_rates,
+                     metrics,
+                     ess,
+                     n_iters,
+                     times,
+                     save_dir):
 
     # save arguments passed into this function (to make it trivial to recreate figures later)
     to_save = locals()
@@ -198,7 +198,7 @@ def define_target_dist(args, seed=123438):
 
 def main(args):
 
-    posterior, chain_init, state_space, true_probs, true_marginals, true_cov_mat = define_target_dist(args)
+    target_dist, chain_init, state_space, true_probs, true_marginals, true_cov_mat = define_target_dist(args)
 
     def metric_fn(*x, ss=state_space, tp=true_probs, tm=true_marginals):
         return compute_metrics(*x, full_state_space=ss, true_probs=tp, true_marginals=tm)
@@ -211,7 +211,7 @@ def main(args):
         {'name': 'GWG'},
     ]
 
-    run_sampling_procedure(args, methods, posterior, chain_init, metric_fn, plot_and_save)
+    run_sampling_procedure(args, methods, target_dist, chain_init, metric_fn, plot_and_save_fn)
 
 
 def parse_args():
@@ -220,8 +220,7 @@ def parse_args():
     num_groups = 4  # 4 groups of replicated covariates, each of size 5
     irrelevant_mult_factor = 4  # 4*20 = 80 `irrelevant' Bernoulli dims
 
-    wallclock_mode, max_runtime, save_freq, metric_tracking_freq = 1, 5.5, 0.001, 1.0  # measured in minutes  # todo
-    # wallclock_mode, max_runtime, save_freq, metric_tracking_freq = 1, 10.5, 0.001, 1.0  # measured in minutes  # todo
+    wallclock_mode, max_runtime, save_freq, metric_tracking_freq = 1, 10.5, 0.001, 1.0  # measured in minutes
     # wallclock_mode, max_runtime, save_freq, metric_tracking_freq = 0, 5000, 1, 500  # measured in iterations
 
     data_dim = D * (irrelevant_mult_factor + 1)
